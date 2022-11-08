@@ -1,129 +1,30 @@
-# Byte-compiled / optimized / DLL files
-__pycache__/
-*.py[cod]
-*$py.class
+import pandas as pd 
+import os
+import numpy as np
 
-# C extensions
-*.so
 
-# Distribution / packaging
-.Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-pip-wheel-metadata/
-share/python-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
-MANIFEST
+with open('seno.txt','r') as arquivo:
+    txt = arquivo.read()                                            #codigo utilizado para importar o arquivo txt com os valores a serem transofrmados
 
-# PyInstaller
-#  Usually these files are written by a python script from a template
-#  before PyInstaller builds the exe, so as to inject date/other infos into it.
-*.manifest
-*.spec
+# txt = '123,2-234000,ABXD234234,23000'
+txt = txt.split(',')                         #Separar a string pela virgula e transformala em uma lista
+nova_lista = []                              #Lista vazia para introduzir os valores e exportala
 
-# Installer logs
-pip-log.txt
-pip-delete-this-directory.txt
-
-# Unit test / coverage reports
-htmlcov/
-.tox/
-.nox/
-.coverage
-.coverage.*
-.cache
-nosetests.xml
-coverage.xml
-*.cover
-*.py,cover
-.hypothesis/
-.pytest_cache/
-
-# Translations
-*.mo
-*.pot
-
-# Django stuff:
-*.log
-local_settings.py
-db.sqlite3
-db.sqlite3-journal
-
-# Flask stuff:
-instance/
-.webassets-cache
-
-# Scrapy stuff:
-.scrapy
-
-# Sphinx documentation
-docs/_build/
-
-# PyBuilder
-target/
-
-# Jupyter Notebook
-.ipynb_checkpoints
-
-# IPython
-profile_default/
-ipython_config.py
-
-# pyenv
-.python-version
-
-# pipenv
-#   According to pypa/pipenv#598, it is recommended to include Pipfile.lock in version control.
-#   However, in case of collaboration, if having platform-specific dependencies or dependencies
-#   having no cross-platform support, pipenv may install dependencies that don't work, or not
-#   install all needed dependencies.
-#Pipfile.lock
-
-# PEP 582; used by e.g. github.com/David-OConnor/pyflow
-__pypackages__/
-
-# Celery stuff
-celerybeat-schedule
-celerybeat.pid
-
-# SageMath parsed files
-*.sage.py
-
-# Environments
-.env
-.venv
-env/
-venv/
-ENV/
-env.bak/
-venv.bak/
-
-# Spyder project settings
-.spyderproject
-.spyproject
-
-# Rope project settings
-.ropeproject
-
-# mkdocs documentation
-/site
-
-# mypy
-.mypy_cache/
-.dmypy.json
-dmypy.json
-
-# Pyre type checker
-.pyre/
+res = [ele.rstrip('0') for ele in txt]       #A lista res é atribuida e assim tirar todos os 0 da direta
+for item in res:
+    item = item.split('-')[-1]               #a lista item sera dividida pelo caracter - para que possamos excluir o 2- do item 2-234000
+    if len(item)==10:                        #caso o tamanho de item for igual 10 ele será adicionado a nova lista, pelo padrao dos valores cedidos o unico sem precisar de modificação ABXD234234
+        nova_lista.append(item)
+    elif len(item) < 10:                     #caso para todos os outros
+        item=item.ljust(3 + len(item), '0')  #aqui sera feito um ajuste na esquerda do numero, adicionando 3 zeros no final do numero, no caso 3 + o tamanho do numero.
+        item=item.rjust(10, '0')             ##aqui sera feito um ajuste na direita do numero, no caso adicioando zeros (0) até completar os padrão de 10 numeros
+        nova_lista.append(item)              #adiciona o item em uma nova lista
+                                             # Como no exercicio não foi cedido nenhuma informação ou parametro vamos apenas um append e join
+indices = ('1','2','1','1')
+txt.clear()
+for i in range(len(indices)):                #Uma iteracao sobre o a quantidade de itens, adicionando os indices com hifen a cada item lido.
+    txt.append('-'.join([indices[i],nova_lista[i]]))
+txt = numpy.asarray(txt)                     #Transforma a lista em uma array com o objeitvo de ser divida como uma matriz e encaixar no excel
+txt = txt.reshape(1,4)                       #Definindo os dados como uma matriz (1,4) uma linha e 4 colunas
+dados = pd.DataFrame(data = txt)             #Codigo padrão do pandas para transformar a matriz em dataframe
+dados.to_excel(r'C:\Users\export_dataframe.xlsx', index = False, header=False)   #codigo de exportação, pode ser mudado para qualquer endereço
